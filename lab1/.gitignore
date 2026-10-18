@@ -1,0 +1,6 @@
+.myvenv/
+venv/
+__pycache__/
+*.pyc
+.ruff_cache/
+.pyright_cache/
