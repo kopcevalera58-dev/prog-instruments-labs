@@ -9,7 +9,7 @@ PATTERNS = {
     "inn":        re.compile(r"^\d{12}$"),
     "passport":   re.compile(r"^\d{2} \d{2} \d{6}$"),
     "occupation": re.compile(r"^[А-ЯЁA-Z][А-Яа-яЁёA-Za-z]*(?:[ -][А-Яа-яЁёA-Za-z]+)*$"),
-    "latitude":   re.compile(r"^-?(?:[0-8]?\d|90)\.\d{6}$"),
+    "latitude":   re.compile(r"^-?(?:[0-8]?\d|90)\.\d+$"),
     "hex_color":  re.compile(r"^#[0-9a-fA-F]{6}$"),
     "issn":       re.compile(r"^\d{4}-\d{4}$"),
     "uuid":       re.compile(r"^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$"),
