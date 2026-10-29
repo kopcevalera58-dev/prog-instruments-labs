@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from cryptography.hazmat.primitives.asymmetric import rsa
 from crypto.asymmetric import AsymmetricCrypto
 from utils.file_utils import FileManager

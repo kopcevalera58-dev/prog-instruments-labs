@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk, messagebox, filedialog, scrolledtext
 from tkinter import simpledialog
 import threading
-import os
 from utils.config_loader import ConfigLoader
 from utils.file_utils import FileManager
 from utils.key_manager import KeyManager
