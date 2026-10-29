@@ -161,11 +161,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Секреты и ключи (критично!)
 oib_3/keys/
 *.pem
 *.key
 
-# Результаты работы программы (бинарники)
 oib_3/*.bin
 *.bin
