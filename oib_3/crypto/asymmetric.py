@@ -12,23 +12,21 @@ class AsymmetricCrypto:
         Args:
             config (Dict[str, Any]): словарь конфигурации
         """
-        match config.get('crypto'):
-            case None:
-                raise KeyError("Секция 'crypto' не найдена")
-            case crypto:
-                match crypto.get('rsa'):
-                    case None:
-                        raise KeyError("Секция 'rsa' не найдена")
-                    case rsa_section:
-                        self._rsa_key_size = rsa_section[0]
-                        self._public_exponent = rsa_section[1]
-                        padding_section = rsa_section[2]
-                        self._padding_scheme = padding_section[0]
-                        self._label = padding_section[3]
+        crypto = config.get('crypto')
+        if crypto is None:
+            raise KeyError("Секция 'crypto' не найдена")
+
+        rsa_section = crypto.get('rsa')
+        if rsa_section is None:
+            raise KeyError("Секция 'rsa' не найдена")
+
+        self._rsa_key_size = rsa_section[0]
+        self._public_exponent = rsa_section[1]
+        padding_section = rsa_section[2]
+        self._label = padding_section[3]
         
-        match self._label:
-            case str():
-                self._label = self._label.encode('utf-8')
+        if isinstance(self._label, str):
+            self._label = self._label.encode('utf-8')
         
         self.backend = default_backend()
     
@@ -56,9 +54,8 @@ class AsymmetricCrypto:
         Returns:
             bytes: зашифрованные данные
         """
-        match data:
-            case b'':
-                raise ValueError("Нет данных для шифрования")
+        if not data:
+            raise ValueError("Нет данных для шифрования")
         
         padding_scheme = padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -77,9 +74,9 @@ class AsymmetricCrypto:
         Returns:
             bytes: расшифрованные данные
         """
-        match encrypted_data:
-            case b'':
-                raise ValueError("Нет данных для расшифрования")
+        
+        if not encrypted_data:
+            raise ValueError("Нет данных для расшифрования")
         
         padding_scheme = padding.OAEP(
             mgf=padding.MGF1(algorithm=hashes.SHA256()),

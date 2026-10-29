@@ -25,10 +25,7 @@ class ConfigLoader:
         Returns:
             Dict[str, Any]: словарь с настройками
         """
-        match self._config:
-            case None:
-                with open(config_path, 'r', encoding='utf-8') as f:
-                    self._config = json.load(f)
-                return self._config
-            case _:
-                return self._config
+        if self._config is None:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                self._config = json.load(f)
+        return self._config

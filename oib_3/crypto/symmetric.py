@@ -38,19 +38,18 @@ class SEEDCipher(SymmetricCipher):
             config (Dict[str, Any]): конфигурация
         """
         crypto_section = config.get('crypto')
-        match crypto_section:
-            case None:
-                raise ValueError("Секция 'crypto' не найдена")
+        if crypto_section is None:
+            raise ValueError("Секция 'crypto' не найдена")
         
         seed_section = crypto_section.get('seed')
-        match seed_section:
-            case None:
-                raise ValueError("Секция 'seed' не найдена")
-            case [16, 16]:
-                self._key_size = 16
-                self._block_size = 16
-            case _:
-                raise ValueError("SEED требует [16, 16]")
+        if seed_section is None:
+            raise ValueError("Секция 'seed' не найдена")
+        
+        if seed_section != [16, 16]:
+            raise ValueError("SEED требует [16, 16]")
+        
+        self._key_size = 16
+        self._block_size = 16
         
         self.backend = default_backend()
     
@@ -73,9 +72,8 @@ class SEEDCipher(SymmetricCipher):
         Returns:
             bytes: IV + зашифрованные данные
         """
-        match plaintext:
-            case b'':
-                raise ValueError("Нет данных для шифрования")
+        if not plaintext:
+            raise ValueError("Нет данных для шифрования")
         
         iv = os.urandom(self._block_size)
         padder = padding.PKCS7(self._block_size * 8).padder()
@@ -96,16 +94,14 @@ class SEEDCipher(SymmetricCipher):
         Returns:
             bytes: расшифрованный текст
         """
-        match ciphertext:
-            case bytes() if len(ciphertext) < 16:
-                raise ValueError("Шифротекст слишком короткий")
+        if len(ciphertext) < 16:
+            raise ValueError("Шифротекст слишком короткий")
         
         iv = ciphertext[:16]
         encrypted = ciphertext[16:]
         
-        match encrypted:
-            case b'':
-                raise ValueError("Нет зашифрованных данных")
+        if not encrypted:
+            raise ValueError("Нет зашифрованных данных")
         
         cipher = Cipher(algorithms.SEED(key), modes.CBC(iv), backend=self.backend)
         decryptor = cipher.decryptor()
@@ -126,19 +122,18 @@ class ChaCha20Cipher(SymmetricCipher):
             config (Dict[str, Any]): конфигурация
         """
         crypto_section = config.get('crypto')
-        match crypto_section:
-            case None:
-                raise ValueError("Секция 'crypto' не найдена")
+        if crypto_section is None:
+            raise ValueError("Секция 'crypto' не найдена")
         
         chacha_section = crypto_section.get('chacha20')
-        match chacha_section:
-            case None:
-                raise ValueError("Секция 'chacha20' не найдена")
-            case [32, 12]:
-                self._key_size = 32
-                self._nonce_size = 12
-            case _:
-                raise ValueError("ChaCha20 требует [32, 12]")
+        if chacha_section is None:
+            raise ValueError("Секция 'chacha20' не найдена")
+        
+        if chacha_section != [32, 12]:
+            raise ValueError("ChaCha20 требует [32, 12]")
+        
+        self._key_size = 32
+        self._nonce_size = 12
     
     def generate_key(self) -> bytes:
         """Генерирует случайный 32-байтный ключ для ChaCha20."""
@@ -159,9 +154,8 @@ class ChaCha20Cipher(SymmetricCipher):
         Returns:
             bytes: nonce + зашифрованные данные
         """
-        match plaintext:
-            case b'':
-                raise ValueError("Нет данных для шифрования")
+        if not plaintext:
+            raise ValueError("Нет данных для шифрования")
         
         nonce = os.urandom(self._nonce_size)
         chacha = ChaCha20Poly1305(key)
@@ -179,22 +173,19 @@ class ChaCha20Cipher(SymmetricCipher):
         Returns:
             bytes: расшифрованный текст
         """
-        match ciphertext:
-            case bytes() if len(ciphertext) < 12:
-                raise ValueError("Шифротекст слишком короткий")
+        if len(ciphertext) < 12:
+            raise ValueError("Шифротекст слишком короткий")
         
         nonce = ciphertext[:12]
         encrypted = ciphertext[12:]
         
-        match encrypted:
-            case b'':
-                raise ValueError("Нет зашифрованных данных")
+        if not encrypted:
+            raise ValueError("Нет зашифрованных данных")
         
         chacha = ChaCha20Poly1305(key)
         plaintext = chacha.decrypt(nonce, encrypted, None)
         
-        match plaintext:
-            case b'':
-                raise RuntimeError("Результат расшифрования пуст")
+        if not plaintext:
+            raise RuntimeError("Результат расшифрования пуст")
         
         return plaintext

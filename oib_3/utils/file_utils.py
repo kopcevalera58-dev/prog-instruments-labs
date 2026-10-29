@@ -13,14 +13,12 @@ class FileManager:
             config (Dict[str, Any]): конфигурация
         """
         paths = config.get('paths')
-        match paths:
-            case None:
-                raise KeyError("Секция 'paths' не найдена")
+        if paths is None:
+            raise KeyError("Секция 'paths' не найдена")
         
         self._keys_dir = paths.get('keys_directory')
-        match self._keys_dir:
-            case None:
-                raise KeyError("Параметр 'keys_directory' не найден")
+        if self._keys_dir is None:
+            raise KeyError("Параметр 'keys_directory' не найден")
         
         os.makedirs(self._keys_dir, exist_ok=True)
         self._paths = paths
@@ -36,9 +34,8 @@ class FileManager:
         Returns:
             Union[str, bytes]: содержимое файла
         """
-        match filepath:
-            case '':
-                raise ValueError("Путь к файлу не может быть пустым")
+        if not filepath:
+            raise ValueError("Путь к файлу не может быть пустым")
         
         mode = 'rb' if binary else 'r'
         with open(filepath, mode) as f:
@@ -53,20 +50,17 @@ class FileManager:
             data (Union[str, bytes]): данные
             binary (bool): бинарный режим
         """
-        match filepath:
-            case '':
-                raise ValueError("Путь к файлу не может быть пустым")
+        if not filepath:
+             raise ValueError("Путь к файлу не может быть пустым")
         
-        match data:
-            case None:
-                raise ValueError("Нет данных для записи")
+        if data is None:
+            raise ValueError("Нет данных для записи")
         
         directory = os.path.dirname(filepath)
-        match directory:
-            case '':
-                os.makedirs('.', exist_ok=True)
-            case _:
-                os.makedirs(directory, exist_ok=True)
+        if not directory:
+            os.makedirs('.', exist_ok=True)
+        else:
+            os.makedirs(directory, exist_ok=True)
         
         mode = 'wb' if binary else 'w'
         with open(filepath, mode) as f:
@@ -82,9 +76,8 @@ class FileManager:
         Returns:
             bool: True если существует
         """
-        match filepath:
-            case '':
-                return False
+        if not filepath:
+            return False
         return os.path.exists(filepath)
     
     def get_path(self, key: str) -> str:
@@ -98,10 +91,9 @@ class FileManager:
             str: полный путь
         """
         filename = self._paths.get(key)
-        match filename:
-            case None:
-                raise KeyError(f"Параметр '{key}' не найден")
-            case '':
-                raise ValueError(f"Путь для ключа '{key}' пуст")
+        if filename is None:
+            raise KeyError(f"Параметр '{key}' не найден")
+        if not filename:
+            raise ValueError(f"Путь для ключа '{key}' пуст")
         
         return os.path.join(self._keys_dir, filename)

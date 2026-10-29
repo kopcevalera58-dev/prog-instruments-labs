@@ -146,15 +146,14 @@ class CryptoGUI:
             filetypes=[('Текстовые файлы', '*.txt'), ('Все файлы', '*.*')]
         )
         
-        match file_path:
-            case '':
-                return
-            case _:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                self.plaintext_text.delete('1.0', tk.END)
-                self.plaintext_text.insert('1.0', content)
-                messagebox.showinfo('Успех', f'Загружено {len(content)} символов')
+        if not file_path:
+            return
+            
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        self.plaintext_text.delete('1.0', tk.END)
+        self.plaintext_text.insert('1.0', content)
+        messagebox.showinfo('Успех', f'Загружено {len(content)} символов')
     
     def select_save_enc_file(self) -> None:
         """Выбор файла для сохранения шифротекста."""
@@ -163,11 +162,9 @@ class CryptoGUI:
             defaultextension='.bin',
             filetypes=[('Бинарные файлы', '*.bin'), ('Все файлы', '*.*')]
         )
-        match file_path:
-            case '':
-                return
-            case _:
-                self.save_enc_file_path.set(file_path)
+        if not file_path:
+            return
+        self.save_enc_file_path.set(file_path)
     
     def select_save_key_file(self) -> None:
         """Выбор файла для сохранения зашифрованного ключа."""
@@ -176,11 +173,9 @@ class CryptoGUI:
             defaultextension='.bin',
             filetypes=[('Бинарные файлы', '*.bin'), ('Все файлы', '*.*')]
         )
-        match file_path:
-            case '':
-                return
-            case _:
-                self.save_key_file_path.set(file_path)
+        if not file_path:
+            return
+        self.save_key_file_path.set(file_path)
     
     def encrypt_data(self) -> None:
         """Шифрует текст."""
@@ -189,25 +184,21 @@ class CryptoGUI:
         enc_file = self.save_enc_file_path.get()
         key_file = self.save_key_file_path.get()
         
-        match plaintext:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Введите текст для шифрования')
-                return
+        if not plaintext:
+            messagebox.showwarning('Предупреждение', 'Введите текст для шифрования')
+            return
         
-        match algorithm:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Выберите алгоритм')
-                return
+        if not algorithm:
+            messagebox.showwarning('Предупреждение', 'Выберите алгоритм')
+            return
         
-        match enc_file:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Выберите файл для сохранения шифротекста')
-                return
+        if not enc_file:
+            messagebox.showwarning('Предупреждение', 'Выберите файл для сохранения шифротекста')
+            return
         
-        match key_file:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Выберите файл для сохранения ключа')
-                return
+        if not key_file:
+            messagebox.showwarning('Предупреждение', 'Выберите файл для сохранения ключа')
+            return
         
         cipher = self.hybrid_crypto.get_cipher(algorithm)
         key_size = cipher.get_key_size()
@@ -218,35 +209,30 @@ class CryptoGUI:
             f"или оставьте пустым для генерации случайного ключа:"
         )
         
-        match key_hex:
-            case None:
-                return
+        if key_hex is None:
+            return
         
         custom_key = None
         hex_str = key_hex.strip()
-        match hex_str:
-            case '':
-                pass
-            case _:
-                try:
-                    custom_key = bytes.fromhex(hex_str)
-                    if len(custom_key) != key_size:
-                        messagebox.showerror('Ошибка', f'Ключ должен быть {key_size} байт')
-                        return
-                except ValueError:
-                    messagebox.showerror('Ошибка', 'Неверный hex формат')
+        if hex_str:
+            try:
+                custom_key = bytes.fromhex(hex_str)
+                if len(custom_key) != key_size:
+                    messagebox.showerror('Ошибка', f'Ключ должен быть {key_size} байт')
                     return
+            except ValueError:
+                messagebox.showerror('Ошибка', 'Неверный hex формат')
+                return
         
         def encrypt_thread() -> None:
             """Поток шифрования."""
             try:
                 public_key = self.key_manager.load_public_key()
                 
-                match custom_key:
-                    case None:
-                        symmetric_key = self.hybrid_crypto.get_cipher(algorithm).generate_key()
-                    case _:
-                        symmetric_key = custom_key
+                if custom_key is None:
+                    symmetric_key = self.hybrid_crypto.get_cipher(algorithm).generate_key()
+                else:
+                    symmetric_key = custom_key
                 
                 encrypted_data, encrypted_key = self.hybrid_crypto.encrypt_hybrid(
                     plaintext.encode('utf-8'), algorithm, public_key, custom_key
@@ -268,11 +254,9 @@ class CryptoGUI:
             title='Выберите файл с шифротекстом',
             filetypes=[('Все файлы', '*.*'), ('Бинарные файлы', '*.bin')]
         )
-        match file_path:
-            case '':
-                return
-            case _:
-                self.ciphertext_path.set(file_path)
+        if not file_path:
+            return
+        self.ciphertext_path.set(file_path)
     
     def select_key_file(self) -> None:
         """Выбор файла с ключом."""
@@ -280,11 +264,9 @@ class CryptoGUI:
             title='Выберите файл с зашифрованным ключом',
             filetypes=[('Все файлы', '*.*'), ('Бинарные файлы', '*.bin')]
         )
-        match file_path:
-            case '':
-                return
-            case _:
-                self.key_file_path.set(file_path)
+        if not file_path:
+            return
+        self.key_file_path.set(file_path)
     
     def _show_encrypt_result(self, encrypted_data: bytes, encrypted_key: bytes, enc_file: str, key_file: str) -> None:
         """Показывает результат шифрования."""
@@ -310,20 +292,17 @@ class CryptoGUI:
         key_file = self.key_file_path.get()
         algorithm = self.decrypt_algorithm.get()
         
-        match ciphertext_file:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Выберите файл с шифротекстом')
-                return
+        if not ciphertext_file:
+            messagebox.showwarning('Предупреждение', 'Выберите файл с шифротекстом')
+            return
         
-        match key_file:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Выберите файл с ключом')
-                return
+        if not key_file:
+            messagebox.showwarning('Предупреждение', 'Выберите файл с ключом')
+            return
         
-        match algorithm:
-            case '':
-                messagebox.showwarning('Предупреждение', 'Выберите алгоритм')
-                return
+        if not algorithm:
+            messagebox.showwarning('Предупреждение', 'Выберите алгоритм')
+            return
         
         def decrypt_thread() -> None:
             """Поток расшифрования."""
@@ -349,32 +328,28 @@ class CryptoGUI:
         messagebox.showinfo('Успех', f'Расшифрование завершено! Получено {len(plaintext)} символов')
         
         save_result = messagebox.askyesno('Сохранение', 'Сохранить расшифрованный текст в файл?')
-        match save_result:
-            case True:
-                file_path = filedialog.asksaveasfilename(
-                    title='Сохранить расшифрованный текст',
-                    defaultextension='.txt',
-                    filetypes=[('Текстовые файлы', '*.txt'), ('Все файлы', '*.*')]
-                )
-                match file_path:
-                    case '':
-                        return
-                    case _:
-                        with open(file_path, 'w', encoding='utf-8') as f:
-                            f.write(plaintext)
-                        messagebox.showinfo('Успех', f'Сохранено в {file_path}')
+        if save_result:
+            file_path = filedialog.asksaveasfilename(
+                title='Сохранить расшифрованный текст',
+                defaultextension='.txt',
+                filetypes=[('Текстовые файлы', '*.txt'), ('Все файлы', '*.*')]
+            )
+            if not file_path:
+                return
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(plaintext)
+            messagebox.showinfo('Успех', f'Сохранено в {file_path}')
     
     def generate_rsa_keys(self) -> None:
         """Генерирует новые RSA ключи."""
         confirm = messagebox.askyesno('Подтверждение', 'Сгенерировать новые RSA ключи? Старые ключи будут перезаписаны!')
-        match confirm:
-            case True:
-                try:
-                    self.key_manager._generate_and_save_rsa_keys()
-                    self.refresh_key_info()
-                    messagebox.showinfo('Успех', 'Новые RSA ключи успешно сгенерированы!')
-                except Exception as e:
-                    messagebox.showerror('Ошибка', f'Не удалось сгенерировать ключи: {e}')
+        if confirm:
+            try:
+                self.key_manager._generate_and_save_rsa_keys()
+                self.refresh_key_info()
+                messagebox.showinfo('Успех', 'Новые RSA ключи успешно сгенерированы!')
+            except Exception as e:
+                messagebox.showerror('Ошибка', f'Не удалось сгенерировать ключи: {e}')
     
     def refresh_key_info(self) -> None:
         """Обновляет информацию о ключах."""

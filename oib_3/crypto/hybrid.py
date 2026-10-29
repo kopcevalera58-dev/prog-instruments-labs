@@ -50,13 +50,12 @@ class HybridCrypto:
         """
         cipher = self.get_cipher(algorithm_name)
         
-        match custom_key:
-            case None:
-                symmetric_key = cipher.generate_key()
-            case _:
-                if len(custom_key) != cipher.get_key_size():
-                    raise ValueError(f"Неверный размер ключа для {algorithm_name}")
-                symmetric_key = custom_key
+        if custom_key is None:
+            symmetric_key = cipher.generate_key()
+        else:
+            if len(custom_key) != cipher.get_key_size():
+                raise ValueError(f"Неверный размер ключа для {algorithm_name}")
+            symmetric_key = custom_key
         
         encrypted_data = cipher.encrypt(plaintext, symmetric_key)
         encrypted_key = self.asymmetric.encrypt_with_public_key(symmetric_key, public_key)

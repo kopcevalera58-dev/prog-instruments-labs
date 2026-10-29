@@ -28,11 +28,10 @@ class KeyManager:
         private_exists = self.file_manager.file_exists(self._private_path)
         public_exists = self.file_manager.file_exists(self._public_path)
         
-        match (private_exists, public_exists):
-            case (True, True):
-                return
-            case _:
-                self._generate_and_save_rsa_keys()
+        if private_exists and public_exists:
+            return
+        else:
+            self._generate_and_save_rsa_keys()
     
     def _generate_and_save_rsa_keys(self) -> None:
         """Генерирует и сохраняет RSA ключи."""
