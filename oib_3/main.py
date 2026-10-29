@@ -345,7 +345,7 @@ class CryptoGUI:
         confirm = messagebox.askyesno('Подтверждение', 'Сгенерировать новые RSA ключи? Старые ключи будут перезаписаны!')
         if confirm:
             try:
-                self.key_manager._generate_and_save_rsa_keys()
+                self.key_manager.generate_and_save_rsa_keys()
                 self.refresh_key_info()
                 messagebox.showinfo('Успех', 'Новые RSA ключи успешно сгенерированы!')
             except Exception as e:
@@ -357,8 +357,7 @@ class CryptoGUI:
         
         try:
             public_key = self.key_manager.load_public_key()
-            private_path = self.key_manager._private_path
-            public_path = self.key_manager._public_path
+            private_path, public_path = self.key_manager.get_key_paths()
             
             info = f"Информация о RSA ключах\n{'='*40}\n\n"
             info += f"Размер ключа: {public_key.key_size} бит\n"

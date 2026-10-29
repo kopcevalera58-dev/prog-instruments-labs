@@ -33,7 +33,7 @@ class KeyManager:
         else:
             self._generate_and_save_rsa_keys()
     
-    def _generate_and_save_rsa_keys(self) -> None:
+    def generate_and_save_rsa_keys(self) -> None:
         """Генерирует и сохраняет RSA ключи."""
         private_key, public_key = self.asymmetric_crypto.generate_rsa_keypair()
         private_bytes = self.asymmetric_crypto.save_private_key_to_bytes(private_key)
@@ -60,3 +60,7 @@ class KeyManager:
         """
         private_bytes = self.file_manager.read_file(self._private_path, binary=True)
         return self.asymmetric_crypto.load_private_key(private_bytes)
+    
+    def get_key_paths(self) -> tuple[str, str]:
+        """Возвращает кортеж: (путь к приватному ключу, путь к публичному ключу)."""
+        return self._private_path, self._public_path
