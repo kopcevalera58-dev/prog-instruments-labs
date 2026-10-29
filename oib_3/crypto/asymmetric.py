@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, Tuple
+from typing import Dict, Any, Tuple
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.backends import default_backend
@@ -44,6 +44,14 @@ class AsymmetricCrypto:
         public_key = private_key.public_key()
         return private_key, public_key
     
+    def _get_oaep_padding(self) -> padding.OAEP:
+        """Создает и возвращает схему дополнения OAEP."""
+        return padding.OAEP(
+            mgf=padding.MGF1(algorithm=hashes.SHA256()),
+            algorithm=hashes.SHA256(),
+            label=self._label
+        )
+    
     def encrypt_with_public_key(self, data: bytes, public_key: rsa.RSAPublicKey) -> bytes:
         """
         Шифрует данные открытым ключом
@@ -57,12 +65,7 @@ class AsymmetricCrypto:
         if not data:
             raise ValueError("Нет данных для шифрования")
         
-        padding_scheme = padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=self._label
-        )
-        return public_key.encrypt(data, padding_scheme)
+        return public_key.encrypt(data, self._get_oaep_padding())
     
     def decrypt_with_private_key(self, encrypted_data: bytes, private_key: rsa.RSAPrivateKey) -> bytes:
         """
@@ -78,12 +81,7 @@ class AsymmetricCrypto:
         if not encrypted_data:
             raise ValueError("Нет данных для расшифрования")
         
-        padding_scheme = padding.OAEP(
-            mgf=padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=self._label
-        )
-        return private_key.decrypt(encrypted_data, padding_scheme)
+        return private_key.decrypt(encrypted_data, self._get_oaep_padding())
     
     def load_private_key(self, key_data: bytes) -> rsa.RSAPrivateKey:
         """
