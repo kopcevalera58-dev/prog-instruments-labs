@@ -7,7 +7,7 @@ from utils.config_loader import ConfigLoader
 from utils.file_utils import FileManager
 from utils.key_manager import KeyManager
 from crypto.hybrid import HybridCrypto
-
+from crypto.constants import AVAILABLE_ALGORITHMS
 
 class CryptoGUI:
     """Главный класс графического приложения."""
@@ -50,10 +50,9 @@ class CryptoGUI:
         self.notebook.add(frame, text='Шифрование')
         
         ttk.Label(frame, text='Алгоритм шифрования:').grid(row=0, column=0, sticky='w', padx=10, pady=5)
-        algorithms = ['SEED', 'ChaCha20']
-        algo_combo = ttk.Combobox(frame, textvariable=self.selected_algorithm, values=algorithms, state='readonly')
+        algo_combo = ttk.Combobox(frame, textvariable=self.selected_algorithm, values=AVAILABLE_ALGORITHMS, state='readonly')
         algo_combo.grid(row=0, column=1, sticky='ew', padx=10, pady=5)
-        self.selected_algorithm.set(algorithms[0])
+        self.selected_algorithm.set(AVAILABLE_ALGORITHMS[0])
         
         ttk.Label(frame, text='Текст для шифрования:').grid(row=1, column=0, sticky='nw', padx=10, pady=5)
         self.plaintext_text = scrolledtext.ScrolledText(frame, height=8, width=60)
@@ -89,9 +88,9 @@ class CryptoGUI:
         self.notebook.add(frame, text='Расшифрование')
         
         ttk.Label(frame, text='Алгоритм шифрования:').grid(row=0, column=0, sticky='w', padx=10, pady=5)
-        algo_combo = ttk.Combobox(frame, textvariable=self.decrypt_algorithm, values=['SEED', 'ChaCha20'], state='readonly')
+        algo_combo = ttk.Combobox(frame, textvariable=self.decrypt_algorithm, values=AVAILABLE_ALGORITHMS, state='readonly')
         algo_combo.grid(row=0, column=1, sticky='ew', padx=10, pady=5)
-        self.decrypt_algorithm.set('SEED')
+        self.decrypt_algorithm.set(AVAILABLE_ALGORITHMS[0])
         
         info_frame = ttk.LabelFrame(frame, text='Зашифрованные файлы', padding=10)
         info_frame.grid(row=1, column=0, columnspan=2, sticky='ew', padx=10, pady=10)
@@ -375,12 +374,10 @@ class CryptoGUI:
         """Запускает приложение."""
         self.root.mainloop()
 
-
 def main() -> None:
     """Главная функция."""
     app = CryptoGUI()
     app.run()
-
 
 if __name__ == "__main__":
     main()

@@ -94,11 +94,11 @@ class SEEDCipher(SymmetricCipher):
         Returns:
             bytes: расшифрованный текст
         """
-        if len(ciphertext) < 16:
+        if len(ciphertext) < self._block_size:
             raise ValueError("Шифротекст слишком короткий")
         
-        iv = ciphertext[:16]
-        encrypted = ciphertext[16:]
+        iv = ciphertext[:self._block_size]
+        encrypted = ciphertext[self._block_size:]
         
         if not encrypted:
             raise ValueError("Нет зашифрованных данных")
@@ -173,11 +173,11 @@ class ChaCha20Cipher(SymmetricCipher):
         Returns:
             bytes: расшифрованный текст
         """
-        if len(ciphertext) < 12:
+        if len(ciphertext) < self._nonce_size:
             raise ValueError("Шифротекст слишком короткий")
         
-        nonce = ciphertext[:12]
-        encrypted = ciphertext[12:]
+        nonce = ciphertext[:self._nonce_size]
+        encrypted = ciphertext[self._nonce_size:]
         
         if not encrypted:
             raise ValueError("Нет зашифрованных данных")

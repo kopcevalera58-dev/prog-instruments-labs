@@ -2,6 +2,7 @@ from typing import Dict, Any, Tuple
 
 from crypto.symmetric import SEEDCipher, ChaCha20Cipher
 from crypto.asymmetric import AsymmetricCrypto
+from crypto.constants import ALGO_SEED, ALGO_CHACHA20
 
 
 class HybridCrypto:
@@ -15,8 +16,8 @@ class HybridCrypto:
         self.config = config
         self.asymmetric = AsymmetricCrypto(config)
         self._cipher_map = {
-            'SEED': SEEDCipher(config),
-            'ChaCha20': ChaCha20Cipher(config)
+            ALGO_SEED: SEEDCipher(config),
+            ALGO_CHACHA20: ChaCha20Cipher(config)
         }
     
     def get_cipher(self, algorithm_name: str):
@@ -28,13 +29,12 @@ class HybridCrypto:
         Returns:
             SymmetricCipher: экземпляр шифра
         """
-        match algorithm_name:
-            case 'SEED':
-                return self._cipher_map['SEED']
-            case 'ChaCha20':
-                return self._cipher_map['ChaCha20']
-            case _:
-                raise ValueError(f"Unknown algorithm: {algorithm_name}")
+        if algorithm_name == ALGO_SEED:
+            return self._cipher_map[ALGO_SEED]
+        elif algorithm_name == ALGO_CHACHA20:
+            return self._cipher_map[ALGO_CHACHA20]
+        else:
+            raise ValueError(f"Unknown algorithm: {algorithm_name}")
     
     def encrypt_hybrid(self, plaintext: bytes, algorithm_name: str, public_key: Any, custom_key: bytes = None) -> Tuple[bytes, bytes]:
         """

@@ -31,7 +31,7 @@ class KeyManager:
         if private_exists and public_exists:
             return
         else:
-            self._generate_and_save_rsa_keys()
+            self.generate_and_save_rsa_keys()
     
     def generate_and_save_rsa_keys(self) -> None:
         """Генерирует и сохраняет RSA ключи."""
